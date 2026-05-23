@@ -1,2 +1,5 @@
 *.md
 Markdown
+__pycache__
+.idea
+.venv
