@@ -6,7 +6,7 @@ from inventory import *
 cell = Room("Cell", "A damp, dark starting room.")
 hallway = Room("Hallway", "A long corridor with flickering torches.")
 cell.add_exit("north", hallway)
-previous_room = None
+previous_room = cell
 current_room = cell
 player = Player("Bodzio", 60, 370, 40)
 goblin = Goblin("Goblin", 50, 350, 30)

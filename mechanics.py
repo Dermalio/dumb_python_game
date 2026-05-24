@@ -3,6 +3,27 @@ import random
 import world
 
 
+def inventory_menu(player):
+    print("Your inventory:")
+    enumerated_inventory = list(enumerate(player.inventory, 1))
+    print("0: <- Go back")
+    for i in enumerated_inventory:
+        print(f"{i[0]}: {i[1]}")
+    inventory_input = input("Which item do you want to use? ")
+    if "back" in inventory_input or inventory_input == "0":
+        return False
+    elif inventory_input.isdigit():
+        inventory_input = int(inventory_input)
+        if 0 < inventory_input <= len(player.inventory):
+            player.use_item(player.inventory[inventory_input - 1])
+            return True
+        else:
+            print("No such item in your inventory")
+            return False
+    else:
+        print("Invalid input, choose a number")
+        return False
+
 def battle(player, enemy):
     while player.health > 0 and enemy.health > 0:
         players_turn_spent = False
@@ -17,20 +38,8 @@ def battle(player, enemy):
                     player.attack(enemy)
                     players_turn_spent = True
                 case '2':
-                    print("Your inventory:")
-                    enumerated_inventory = list(enumerate(player.inventory, 1))
-                    for i in enumerated_inventory:
-                        print(f"{i[0]} : {i[1]}")
-                    inventory_input = input("Which item do you want to use? ")
-                    if inventory_input.isdigit():
-                        inventory_input = int(inventory_input)
-                        if 0 < inventory_input <= len(player.inventory):
-                            player.use_item(player.inventory[inventory_input - 1])
-                            players_turn_spent = True
-                        else:
-                            print("No such item in your inventory")
-                    else:
-                        print("Invalid input, choose a number")
+                    if inventory_menu(player):
+                        players_turn_spent = True
                 case '3':
                     player.show_stats()
                 case '4':
@@ -88,19 +97,7 @@ def choose_action(player, current_room, previous_room):
             else:
                 print("No enemies in sight, choose a different action")
         elif action_input == "3" or action_input == "use":
-            print("Your inventory:")
-            enumerated_inventory = list(enumerate(player.inventory, 1))
-            for i in enumerated_inventory:
-                print(f"{i[0]} : {i[1]}")
-            inventory_input = input("Which item do you want to use? ")
-            if inventory_input.isdigit():
-                inventory_input = int(inventory_input)
-                if 0 < inventory_input <= len(player.inventory):
-                    player.use_item(player.inventory[inventory_input-1])
-                else:
-                    print("No such item in your inventory")
-            else:
-                print("Invalid input, choose a number")
+            inventory_menu(player)
 
         elif action_input == "4" or action_input == "stat":
             player.show_stats()

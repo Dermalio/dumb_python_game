@@ -1,5 +1,4 @@
 import re
-import inventory
 
 class Character:
     def __init__(self, name, attack_power, max_health, resistance):
@@ -21,11 +20,10 @@ class Character:
             print(f"{self.name} picked up a {item}.")
 
     def use_item(self, searched_item):
-        print(f"{searched_item.name} used.")
-        if isinstance(searched_item, inventory.Potion):
-            searched_item.consume(self)
+        is_spent = searched_item.use(self)
+        if is_spent:
             self.inventory.remove(searched_item)
-            return
+        return
 
     def attack(self, target):
         if self.health > 0:
