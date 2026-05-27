@@ -24,6 +24,27 @@ def inventory_menu(player):
         print("Invalid input, choose a number")
         return False
 
+def skills_menu(player, target):
+    print("Your attacks:")
+    enumerated_attacks = list(enumerate(player.attacks, 1))
+    print("0: <- Go back")
+    for i in enumerated_attacks:
+        print(f"{i[0]}: {i[1]}")
+    attack_input = input("How do you want to attack?")
+    if "back" in attack_input or attack_input == "0":
+        return False
+    elif attack_input.isdigit():
+        attack_input = int(attack_input)
+        if 0 < attack_input <= len(player.attacks):
+            player.attacks[attack_input - 1].execute_attack(player, target)
+            return True
+        else:
+            print("Invalid input, no such attack")
+            return False
+    else:
+        print("Invalid input, choose a number")
+        return False
+
 def battle(player, enemy):
     while player.health > 0 and enemy.health > 0:
         players_turn_spent = False
@@ -35,8 +56,8 @@ def battle(player, enemy):
                                 '4. Run away\n').lower()
             match fight_input:
                 case '1':
-                    player.attack(enemy)
-                    players_turn_spent = True
+                    if skills_menu(player, enemy):
+                        players_turn_spent = True
                 case '2':
                     if inventory_menu(player):
                         players_turn_spent = True
@@ -50,7 +71,7 @@ def battle(player, enemy):
                         print("Escape failed")
                         players_turn_spent = True
         if enemy.health > 0:
-            enemy.attack(player)
+            enemy.attacks[0].execute_attack(enemy, player)
         else:
             return "won"
         if player.health <= 0:
@@ -68,11 +89,11 @@ def choose_direction(chosen_room):
             print("You bump into a wall, choose a different direction")
 
 
-def choose_action(player, current_room, previous_room):
+def choose_action(player, target, current_room, previous_room):
     while True:
         action_input = input("What do you want to do? \n"
                              "1. Move\n"
-                             "2. Attack\n"
+                             "2. Fight enemies\n"
                              "3. Use\n"
                              "4. Stat check\n").lower()
 
