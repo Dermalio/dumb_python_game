@@ -1,6 +1,9 @@
 from curses.ascii import isdigit
 import random
 import world
+from characters_db import CHARACTERS
+from character import Character
+from attacks import *
 
 
 def inventory_menu(player):
@@ -30,7 +33,7 @@ def skills_menu(player, target):
     print("0: <- Go back")
     for i in enumerated_attacks:
         print(f"{i[0]}: {i[1]}")
-    attack_input = input("How do you want to attack?")
+    attack_input = input("How do you want to attack? ")
     if "back" in attack_input or attack_input == "0":
         return False
     elif attack_input.isdigit():
@@ -125,3 +128,25 @@ def choose_action(player, target, current_room, previous_room):
 
         else:
             print("No such action")
+
+def spawn_characters(character_key):
+    attack_mapping = {
+        "Light Attack": LightAttack,
+        "Heavy Attack": HeavyAttack,
+        "Jab": Jab
+    }
+
+    if character_key in CHARACTERS:
+        character_stats = CHARACTERS[character_key]
+        character = Character(character_stats["name"],
+                  character_stats["attack_power"],
+                  character_stats["max_health"],
+                  character_stats["resistance"],
+                  character_stats["crit_chance"])
+        character.attacks = []
+        for attack in character_stats["attacks"]:
+            character_attack = attack_mapping[attack]()
+            character.attacks.append(character_attack)
+        return character
+    else:
+        raise Exception(f"No {character_key} in your database.")

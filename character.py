@@ -1,7 +1,5 @@
 import re
 
-from attacks import LightAttack, HeavyAttack, Jab
-
 
 class Character:
     def __init__(self, name, attack_power, max_health, resistance, crit_chance):
@@ -12,6 +10,7 @@ class Character:
         self.resistance = resistance
         self.inventory = []
         self.crit_chance = crit_chance
+        self.attacks = []
 
     def __repr__(self):
         return self.name
@@ -40,13 +39,4 @@ class Character:
         print("=" * 20 + "\n")
 
 
-class Player(Character):
-    def __init__(self, name, attack_power, max_health, resistance, crit_chance):
-        super().__init__(name, attack_power, max_health, resistance, crit_chance)
-        self.attacks = [LightAttack(), HeavyAttack(), Jab()]
-
-class Goblin(Character):
-    def __init__(self, name, attack_power, max_health, resistance, crit_chance):
-        super().__init__(name, attack_power, max_health, resistance, crit_chance)
-        self.attacks = [LightAttack()]
 

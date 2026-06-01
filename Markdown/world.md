@@ -1,6 +1,4 @@
 ```
-import character
-
 class Room:
     def __init__(self, name, description):
         self.name = name
@@ -25,4 +23,5 @@ class Room:
 
     def add_enemy(self, enemy):
         self.enemies.append(enemy)
+
 ```

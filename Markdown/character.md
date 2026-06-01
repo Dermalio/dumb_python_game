@@ -1,15 +1,17 @@
 ```
 import re
-import inventory
+
 
 class Character:
-    def __init__(self, name, attack_power, max_health, resistance):
+    def __init__(self, name, attack_power, max_health, resistance, crit_chance):
         self.name = name
         self.attack_power = attack_power
         self.max_health = max_health
         self.health = self.max_health
         self.resistance = resistance
         self.inventory = []
+        self.crit_chance = crit_chance
+        self.attacks = []
 
     def __repr__(self):
         return self.name
@@ -22,24 +24,11 @@ class Character:
             print(f"{self.name} picked up a {item}.")
 
     def use_item(self, searched_item):
-        print(f"{searched_item.name} used.")
-        if isinstance(searched_item, inventory.Potion):
-            searched_item.consume(self)
+        is_spent = searched_item.use(self)
+        if is_spent:
             self.inventory.remove(searched_item)
-            return
+        return
 
-    def attack(self, target):
-        if self.health > 0:
-            if self.attack_power > target.resistance:
-                damage = self.attack_power - target.resistance
-                target.health -= damage
-                if target.health <= 0:
-                    target.health = 0
-                    print(f"{target.name} died")
-                else:
-                    print(f"{self.name} dealt {damage} damage to {target.name}. {target.name} has {target.health} hit points left.")
-            elif self.attack_power <= target.resistance:
-                print(f"{self.name}'s attacks are ineffective! {target.name}'s resistance is too high!")
 
     def show_stats(self):
         print("\n" + "=" * 20)
@@ -50,13 +39,5 @@ class Character:
         print(f" DEF:    {self.resistance}")
         print("=" * 20 + "\n")
 
-
-class Player(Character):
-    def __init__(self, name, attack_power, max_health, resistance):
-        super().__init__(name, attack_power, max_health, resistance)
-
-class Goblin(Character):
-    def __init__(self, name, attack_power, max_health, resistance):
-        super().__init__(name, attack_power, max_health, resistance)
 
 ```

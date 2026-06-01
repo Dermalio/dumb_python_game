@@ -2,7 +2,52 @@
 from curses.ascii import isdigit
 import random
 import world
+from characters_db import CHARACTERS
+from character import Character
+from attacks import *
 
+
+def inventory_menu(player):
+    print("Your inventory:")
+    enumerated_inventory = list(enumerate(player.inventory, 1))
+    print("0: <- Go back")
+    for i in enumerated_inventory:
+        print(f"{i[0]}: {i[1]}")
+    inventory_input = input("Which item do you want to use? ")
+    if "back" in inventory_input or inventory_input == "0":
+        return False
+    elif inventory_input.isdigit():
+        inventory_input = int(inventory_input)
+        if 0 < inventory_input <= len(player.inventory):
+            player.use_item(player.inventory[inventory_input - 1])
+            return True
+        else:
+            print("No such item in your inventory")
+            return False
+    else:
+        print("Invalid input, choose a number")
+        return False
+
+def skills_menu(player, target):
+    print("Your attacks:")
+    enumerated_attacks = list(enumerate(player.attacks, 1))
+    print("0: <- Go back")
+    for i in enumerated_attacks:
+        print(f"{i[0]}: {i[1]}")
+    attack_input = input("How do you want to attack? ")
+    if "back" in attack_input or attack_input == "0":
+        return False
+    elif attack_input.isdigit():
+        attack_input = int(attack_input)
+        if 0 < attack_input <= len(player.attacks):
+            player.attacks[attack_input - 1].execute_attack(player, target)
+            return True
+        else:
+            print("Invalid input, no such attack")
+            return False
+    else:
+        print("Invalid input, choose a number")
+        return False
 
 def battle(player, enemy):
     while player.health > 0 and enemy.health > 0:
@@ -15,23 +60,11 @@ def battle(player, enemy):
                                 '4. Run away\n').lower()
             match fight_input:
                 case '1':
-                    player.attack(enemy)
-                    players_turn_spent = True
+                    if skills_menu(player, enemy):
+                        players_turn_spent = True
                 case '2':
-                    print("Your inventory:")
-                    enumerated_inventory = list(enumerate(player.inventory, 1))
-                    for i in enumerated_inventory:
-                        print(f"{i[0]} : {i[1]}")
-                    inventory_input = input("Which item do you want to use? ")
-                    if inventory_input.isdigit():
-                        inventory_input = int(inventory_input)
-                        if 0 < inventory_input <= len(player.inventory):
-                            player.use_item(player.inventory[inventory_input - 1])
-                            players_turn_spent = True
-                        else:
-                            print("No such item in your inventory")
-                    else:
-                        print("Invalid input, choose a number")
+                    if inventory_menu(player):
+                        players_turn_spent = True
                 case '3':
                     player.show_stats()
                 case '4':
@@ -42,7 +75,7 @@ def battle(player, enemy):
                         print("Escape failed")
                         players_turn_spent = True
         if enemy.health > 0:
-            enemy.attack(player)
+            enemy.attacks[0].execute_attack(enemy, player)
         else:
             return "won"
         if player.health <= 0:
@@ -60,11 +93,11 @@ def choose_direction(chosen_room):
             print("You bump into a wall, choose a different direction")
 
 
-def choose_action(player, current_room, previous_room):
+def choose_action(player, target, current_room, previous_room):
     while True:
         action_input = input("What do you want to do? \n"
                              "1. Move\n"
-                             "2. Attack\n"
+                             "2. Fight enemies\n"
                              "3. Use\n"
                              "4. Stat check\n").lower()
 
@@ -89,23 +122,33 @@ def choose_action(player, current_room, previous_room):
             else:
                 print("No enemies in sight, choose a different action")
         elif action_input == "3" or action_input == "use":
-            print("Your inventory:")
-            enumerated_inventory = list(enumerate(player.inventory, 1))
-            for i in enumerated_inventory:
-                print(f"{i[0]} : {i[1]}")
-            inventory_input = input("Which item do you want to use? ")
-            if inventory_input.isdigit():
-                inventory_input = int(inventory_input)
-                if 0 < inventory_input <= len(player.inventory):
-                    player.use_item(player.inventory[inventory_input-1])
-                else:
-                    print("No such item in your inventory")
-            else:
-                print("Invalid input, choose a number")
+            inventory_menu(player)
 
         elif action_input == "4" or action_input == "stat":
             player.show_stats()
 
         else:
             print("No such action")
+
+def spawn_characters(character_key):
+    attack_mapping = {
+        "Light Attack": LightAttack,
+        "Heavy Attack": HeavyAttack,
+        "Jab": Jab
+    }
+
+    if character_key in CHARACTERS:
+        character_stats = CHARACTERS[character_key]
+        character = Character(character_stats["name"],
+                  character_stats["attack_power"],
+                  character_stats["max_health"],
+                  character_stats["resistance"],
+                  character_stats["crit_chance"])
+        character.attacks = []
+        for attack in character_stats["attacks"]:
+            character_attack = attack_mapping[attack]()
+            character.attacks.append(character_attack)
+        return character
+    else:
+        raise Exception(f"No {character_key} in your database.")
 ```
