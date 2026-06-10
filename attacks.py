@@ -21,10 +21,10 @@ class Attack:
                 crit_chance = random.random()
                 if crit_chance <= attacker.crit_chance:
                     target.health -= int(final_damage * 1.5)
-                    print(f"Critical hit! Dealt {int(final_damage * 1.5)}. {target.name} has {target.health} HP left.")
+                    print(f"Critical hit! {attacker.name} dealt {int(final_damage * 1.5)}. {target.name} has {target.health} HP left.")
                 else:
                     target.health -= final_damage
-                    print(f"Dealt {final_damage} damage. {target.name} has {target.health} HP left.")
+                    print(f"{attacker.name} dealt {final_damage} damage. {target.name} has {target.health} HP left.")
             else:
                 print("Attack missed!")
 

@@ -5,7 +5,8 @@ CHARACTERS = {
         "max_health": 350,
         "resistance": 40,
         "crit_chance": 0.2,
-        "attacks": ["Light Attack"]
+        "attacks": ["Light Attack"],
+        "difficulty": []
     },
     "goblin_scout": {
         "name": "Goblin Scout",
@@ -13,7 +14,8 @@ CHARACTERS = {
         "max_health": 100,
         "resistance": 30,
         "crit_chance": 0.1,
-        "attacks": ["Light Attack"]
+        "attacks": ["Light Attack"],
+        "difficulty": range(0,5)
     },
     "orc_warrior": {
         "name": "Orc Warrior",
@@ -21,7 +23,8 @@ CHARACTERS = {
         "max_health": 200,
         "resistance": 20,
         "crit_chance": 0.2,
-        "attacks": ["Light Attack"]
+        "attacks": ["Light Attack"],
+        "difficulty": range(3,9)
     },
     "troll_archer": {
         "name": "Troll Archer",
@@ -29,6 +32,7 @@ CHARACTERS = {
         "max_health": 150,
         "resistance": 20,
         "crit_chance": 0.3,
-        "attacks": ["Light Attack"]
+        "attacks": ["Light Attack"],
+        "difficulty": range(7,14)
     },
 }
