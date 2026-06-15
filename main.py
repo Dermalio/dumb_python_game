@@ -8,8 +8,6 @@ previous_room = starting_room
 current_room = starting_room
 player = spawn_characters("player")
 goblin = spawn_characters("goblin_scout")
-health_potion = HealthPotion("Minor Health Potion", 30)
-player.pick_up_item(health_potion)
 
 while True:
     print("=========================================================")

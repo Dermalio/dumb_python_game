@@ -1,5 +1,4 @@
-from curses.ascii import isdigit
-import random
+from inventory import Consumable
 from world import *
 from characters_db import CHARACTERS
 from character import Character
@@ -123,7 +122,7 @@ def choose_direction(player_location):
             case _:
                 print("You bump into a wall, choose a different direction")
     print("You've reached the exit. Good luck on your next journey!")
-    return None
+    return None3
 
 def roll_category(category, room_count):
     roll = random.random()
@@ -149,6 +148,35 @@ def generate_loot(room_count):
         loot.append(throwable)
 
     return loot
+
+def distribute_loot(player, loot_list):
+    for item in loot_list:
+        if item in CONSUMABLES:
+            item_scheme = CONSUMABLES[item]
+            item_name = item_scheme["name"]
+            magnitude = item_scheme["effect_magnitude"]
+            stat = item_scheme["stat"]
+            message = item_scheme["use_message"]
+            new_item = Consumable(item_name, magnitude, stat, message)
+            player.pick_up_item(new_item)
+        elif item in THROWABLE:
+            item_scheme = THROWABLE[item]
+            item_name = item_scheme["name"]
+            magnitude = item_scheme["effect_magnitude"]
+            stat = item_scheme["stat"]
+            message = item_scheme["use_message"]
+            new_item = Consumable(item_name, magnitude, stat, message)
+            player.pick_up_item(new_item)
+        elif item in BUFFS:
+            item_scheme = BUFFS[item]
+            buff_name = item_scheme["name"]
+            magnitude = item_scheme["effect_magnitude"]
+            stat = item_scheme["stat"]
+            current_stat_value = getattr(player, stat)
+            new_stat_value = current_stat_value + magnitude
+            setattr(player, stat, new_stat_value)
+            print(f"You used {buff_name}. {stat} permanently increased by {magnitude}.")
+
 
 
 def choose_action(player, current_room, previous_room):

@@ -7,6 +7,7 @@ class Attack:
         self.hit_threshold = hit_threshold
         self.attack_count = attack_count
         self.accuracy_modifier = 1
+        self.crit_multiplier = 1.5
 
     def __repr__(self):
         return self.name
@@ -20,8 +21,8 @@ class Attack:
             if hit_chance <= total_accuracy:
                 crit_chance = random.random()
                 if crit_chance <= attacker.crit_chance:
-                    target.health -= int(final_damage * 1.5)
-                    print(f"Critical hit! {attacker.name} dealt {int(final_damage * 1.5)}. {target.name} has {target.health} HP left.")
+                    target.health -= int(final_damage * self.crit_multiplier)
+                    print(f"Critical hit! {attacker.name} dealt {int(final_damage * self.crit_multiplier)}. {target.name} has {target.health} HP left.")
                 else:
                     target.health -= final_damage
                     print(f"{attacker.name} dealt {final_damage} damage. {target.name} has {target.health} HP left.")
