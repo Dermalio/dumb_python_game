@@ -25,7 +25,7 @@ class Attack:
                     print(f"Critical hit! {attacker.name} dealt {int(final_damage * self.crit_multiplier)}. {target.name} has {target.health} HP left.")
                 else:
                     target.health -= final_damage
-                    print(f"{attacker.name} dealt {final_damage} damage. {target.name} has {target.health} HP left.")
+                    print(f"{attacker.name} dealt {final_damage} damage. {target.name} has {max(0, target.health)} HP left.")
             else:
                 print("Attack missed!")
 

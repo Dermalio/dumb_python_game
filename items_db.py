@@ -60,7 +60,6 @@ BUFFS = {
     "warriors_wrath": {
         "name": "Warrior's Wrath",
         "effect_magnitude": 10,
-        "duration": 1,
         "stat": "attack_power",
         "difficulty": range(1, 14),
         "drop_chance": 0.1,
@@ -68,7 +67,6 @@ BUFFS = {
     "sages_wisdom": {
         "name": "Sage's Wisdom",
         "effect_magnitude": 30,
-        "duration": 1,
         "stat": "max_mana",
         "difficulty": range(1, 14),
         "drop_chance": 0.1, #TODO: MAKE CLASSES USING MANA AS A RESOURCE FOR ATTACKS
@@ -76,7 +74,6 @@ BUFFS = {
     "chitin_armor": {
         "name": "Chitin Armor",
         "effect_magnitude": 10,
-        "duration": 1,
         "stat": "resistance",
         "difficulty": range(1, 14),
         "drop_chance": 0.1,
@@ -86,7 +83,7 @@ BUFFS = {
 THROWABLE = {
     "fire_flask": {
         "name": "Fire Flask",
-        "effect_magnitude": -30,
+        "effect_magnitude": 30,
         "duration": 1,
         "stat": "health",
         "difficulty": range(1, 14),
@@ -95,7 +92,7 @@ THROWABLE = {
     },
     "searing_decay": {
         "name": "Searing Decay",
-        "effect_magnitude": -9,
+        "effect_magnitude": 9,
         "duration": 5,
         "stat": "health",
         "difficulty": range(1, 14),

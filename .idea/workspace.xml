@@ -2,12 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b2736eef-83e9-473c-88ee-52ee95fbe20c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Markdown/character.md" beforeDir="false" afterPath="$PROJECT_DIR$/Markdown/character.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Markdown/inventory.md" beforeDir="false" afterPath="$PROJECT_DIR$/Markdown/inventory.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Markdown/main.md" beforeDir="false" afterPath="$PROJECT_DIR$/Markdown/main.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Markdown/mechanics.md" beforeDir="false" afterPath="$PROJECT_DIR$/Markdown/mechanics.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Markdown/world.md" beforeDir="false" afterPath="$PROJECT_DIR$/Markdown/world.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/attacks.py" beforeDir="false" afterPath="$PROJECT_DIR$/attacks.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/character.py" beforeDir="false" afterPath="$PROJECT_DIR$/character.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/inventory.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/items_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/items_db.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mechanics.py" beforeDir="false" afterPath="$PROJECT_DIR$/mechanics.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/world.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

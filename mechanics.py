@@ -4,6 +4,7 @@ from characters_db import CHARACTERS
 from character import Character
 from attacks import *
 from items_db import *
+from config import *
 
 dungeon_manager_stack = Exploration()
 
@@ -13,7 +14,7 @@ def inventory_menu(player):
     enumerated_inventory = list(enumerate(player.inventory, 1))
     print("0: <- Go back")
     for i in enumerated_inventory:
-        print(f"{i[0]}: {i[1]}")
+        print(f"{i[0]}: {i[1].name}")
     inventory_input = input("Which item do you want to use? ")
     if "back" in inventory_input or inventory_input == "0":
         return False
@@ -70,7 +71,7 @@ def battle(player, enemy):
                     player.show_stats()
                 case '4':
                     escape_chance = random.random()
-                    if escape_chance < 0.75:
+                    if escape_chance < FLEE_CHANCE:
                         return "ran"
                     else:
                         print("Escape failed")
@@ -90,7 +91,7 @@ def enemy_selection(room_count):
     return temp_enemy_pool
 
 def choose_direction(player_location):
-    while dungeon_manager_stack.rooms_cleared <= 14:
+    while dungeon_manager_stack.rooms_cleared <= ROOMS_TO_WIN:
         move_command = input("How will you proceed?\n"
                              "1. Go deeper\n"
                              "2. Retreat\n").lower()
@@ -104,9 +105,9 @@ def choose_direction(player_location):
                         enemy_pool = enemy_selection(dungeon_manager_stack.rooms_cleared)
                         enemy = spawn_characters(random.choice(enemy_pool))
                         current_room.add_enemy(enemy)
-                        dungeon_manager_stack.spawn_chance = 0.25
+                        dungeon_manager_stack.reset_spawn_chance()
                     else:
-                        dungeon_manager_stack.spawn_chance += 0.05
+                        dungeon_manager_stack.spawn_chance += SPAWN_CHANCE_INCREASE
                         dungeon_manager_stack.rooms_cleared += 1
                     return current_room
                 else:
@@ -122,16 +123,24 @@ def choose_direction(player_location):
             case _:
                 print("You bump into a wall, choose a different direction")
     print("You've reached the exit. Good luck on your next journey!")
-    return None3
+    return None
 
 def roll_category(category, room_count):
+    filtered_items = []
+    drop_chance_sum = 0
     roll = random.random()
     for item, stats in category.items():
         if room_count in stats["difficulty"]:
-            if roll > stats["drop_chance"]:
-                roll -= stats["drop_chance"]
+            filtered_items.append((item, stats))
+            drop_chance_sum += stats["drop_chance"]
+    if drop_chance_sum > 0 and roll <= MAX_DROP_THRESHOLD:
+        for item in filtered_items:
+            normalized_drop_chance = (item[1]["drop_chance"] / drop_chance_sum) * MAX_DROP_THRESHOLD
+            if roll > normalized_drop_chance:
+                roll -= normalized_drop_chance
             else:
-                return item
+                return item[0]
+    return None
 
 def generate_loot(room_count):
     loot = []
@@ -153,19 +162,19 @@ def distribute_loot(player, loot_list):
     for item in loot_list:
         if item in CONSUMABLES:
             item_scheme = CONSUMABLES[item]
-            item_name = item_scheme["name"]
-            magnitude = item_scheme["effect_magnitude"]
-            stat = item_scheme["stat"]
-            message = item_scheme["use_message"]
-            new_item = Consumable(item_name, magnitude, stat, message)
+            new_item = Consumable(
+                item_scheme["name"],
+                item_scheme["effect_magnitude"],
+                item_scheme["stat"],
+                item_scheme["use_message"])
             player.pick_up_item(new_item)
         elif item in THROWABLE:
             item_scheme = THROWABLE[item]
-            item_name = item_scheme["name"]
-            magnitude = item_scheme["effect_magnitude"]
-            stat = item_scheme["stat"]
-            message = item_scheme["use_message"]
-            new_item = Consumable(item_name, magnitude, stat, message)
+            new_item = Consumable(
+                item_scheme["name"],
+                item_scheme["effect_magnitude"],
+                item_scheme["stat"],
+                item_scheme["use_message"])
             player.pick_up_item(new_item)
         elif item in BUFFS:
             item_scheme = BUFFS[item]
@@ -200,6 +209,8 @@ def choose_action(player, current_room, previous_room):
                         print("You won!")
                         current_room.enemies.remove(current_room.enemies[0])
                         dungeon_manager_stack.rooms_cleared += 1
+                        loot = generate_loot(dungeon_manager_stack.rooms_cleared)
+                        distribute_loot(player, loot)
                         return current_room
                     case "lost":
                         print("You lost! Game Over!")

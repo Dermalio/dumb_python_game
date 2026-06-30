@@ -1,10 +1,13 @@
 ```
-from curses.ascii import isdigit
-import random
-import world
+from inventory import Consumable
+from world import *
 from characters_db import CHARACTERS
 from character import Character
 from attacks import *
+from items_db import *
+from config import *
+
+dungeon_manager_stack = Exploration()
 
 
 def inventory_menu(player):
@@ -12,7 +15,7 @@ def inventory_menu(player):
     enumerated_inventory = list(enumerate(player.inventory, 1))
     print("0: <- Go back")
     for i in enumerated_inventory:
-        print(f"{i[0]}: {i[1]}")
+        print(f"{i[0]}: {i[1].name}")
     inventory_input = input("Which item do you want to use? ")
     if "back" in inventory_input or inventory_input == "0":
         return False
@@ -69,7 +72,7 @@ def battle(player, enemy):
                     player.show_stats()
                 case '4':
                     escape_chance = random.random()
-                    if escape_chance < 0.75:
+                    if escape_chance < FLEE_CHANCE:
                         return "ran"
                     else:
                         print("Escape failed")
@@ -81,19 +84,104 @@ def battle(player, enemy):
         if player.health <= 0:
             return "lost"
 
-def choose_direction(chosen_room):
-    while True:
-        move_command = input("Choose a direction to go (north, south, east, west): ").lower()
+def enemy_selection(room_count):
+    temp_enemy_pool = []
+    for enemy, stats in CHARACTERS.items():
+        if room_count in stats["difficulty"]:
+            temp_enemy_pool.append(enemy)
+    return temp_enemy_pool
 
-        if move_command in chosen_room.exits.keys():
-            current_room = chosen_room.exits[move_command]
-            print(f"You entered {current_room.name}")
-            return current_room
-        else:
-            print("You bump into a wall, choose a different direction")
+def choose_direction(player_location):
+    while dungeon_manager_stack.rooms_cleared <= ROOMS_TO_WIN:
+        move_command = input("How will you proceed?\n"
+                             "1. Go deeper\n"
+                             "2. Retreat\n").lower()
+        spawn_risk = random.random()
+        match move_command:
+            case "1" | "deeper":
+                if player_location == dungeon_manager_stack.peek():
+                    current_room = Room()
+                    dungeon_manager_stack.push(current_room)
+                    if spawn_risk < dungeon_manager_stack.spawn_chance:
+                        enemy_pool = enemy_selection(dungeon_manager_stack.rooms_cleared)
+                        enemy = spawn_characters(random.choice(enemy_pool))
+                        current_room.add_enemy(enemy)
+                        dungeon_manager_stack.reset_spawn_chance()
+                    else:
+                        dungeon_manager_stack.spawn_chance += SPAWN_CHANCE_INCREASE
+                        dungeon_manager_stack.rooms_cleared += 1
+                    return current_room
+                else:
+                    return dungeon_manager_stack.peek()
+            case "2" | "retreat":
+                if dungeon_manager_stack.size() > 1:
+                    dungeon_manager_stack.pop()
+                    current_room = dungeon_manager_stack.peek()
+                    print(f"You have retreated to {current_room.name}")
+                    return current_room
+                else:
+                    print("You can't retreat any further!")
+            case _:
+                print("You bump into a wall, choose a different direction")
+    print("You've reached the exit. Good luck on your next journey!")
+    return None
+
+def roll_category(category, room_count):
+    roll = random.random()
+    for item, stats in category.items():
+        if room_count in stats["difficulty"]:
+            if roll > stats["drop_chance"]:
+                roll -= stats["drop_chance"]
+            else:
+                return item
+
+def generate_loot(room_count):
+    loot = []
+    consumable = roll_category(CONSUMABLES, room_count)
+    if consumable:
+        loot.append(consumable)
+
+    buff = roll_category(BUFFS, room_count)
+    if buff:
+        loot.append(buff)
+
+    throwable = roll_category(THROWABLE, room_count)
+    if throwable:
+        loot.append(throwable)
+
+    return loot
+
+def distribute_loot(player, loot_list):
+    for item in loot_list:
+        if item in CONSUMABLES:
+            item_scheme = CONSUMABLES[item]
+            new_item = Consumable(
+                item_scheme["name"],
+                item_scheme["effect_magnitude"],
+                item_scheme["stat"],
+                item_scheme["use_message"])
+            player.pick_up_item(new_item)
+        elif item in THROWABLE:
+            item_scheme = THROWABLE[item]
+            new_item = Consumable(
+                item_scheme["name"],
+                item_scheme["effect_magnitude"],
+                item_scheme["stat"],
+                item_scheme["use_message"])
+            player.pick_up_item(new_item)
+        elif item in BUFFS:
+            item_scheme = BUFFS[item]
+            buff_name = item_scheme["name"]
+            magnitude = item_scheme["effect_magnitude"]
+            stat = item_scheme["stat"]
+            current_stat_value = getattr(player, stat)
+            new_stat_value = current_stat_value + magnitude
+            setattr(player, stat, new_stat_value)
+            print(f"You used {buff_name}. {stat} permanently increased by {magnitude}.")
 
 
-def choose_action(player, target, current_room, previous_room):
+
+def choose_action(player, current_room, previous_room):
     while True:
         action_input = input("What do you want to do? \n"
                              "1. Move\n"
@@ -101,17 +189,21 @@ def choose_action(player, target, current_room, previous_room):
                              "3. Use\n"
                              "4. Stat check\n").lower()
 
-        if action_input == "1" or action_input == "move": # TODO: match case could do well here too like in battle()
-            current_room = choose_direction(current_room)  # TODO: can't move before defeating all enemies
-            return current_room
+        if action_input == "1" or action_input == "move":
+            if not current_room.enemies:
+                current_room = choose_direction(current_room)
+                return current_room
+            print("You must defeat all enemies before moving.")
         elif action_input == "2" or action_input == "attack":
-            print(current_room.enemies[0].name) ## TODO: Make it show at the entrance
             if current_room.enemies:
                 battle_outcome = battle(player, current_room.enemies[0])
                 match battle_outcome:
                     case "won":
                         print("You won!")
                         current_room.enemies.remove(current_room.enemies[0])
+                        dungeon_manager_stack.rooms_cleared += 1
+                        loot = generate_loot(dungeon_manager_stack.rooms_cleared)
+                        distribute_loot(player, loot)
                         return current_room
                     case "lost":
                         print("You lost! Game Over!")
@@ -151,4 +243,5 @@ def spawn_characters(character_key):
         return character
     else:
         raise Exception(f"No {character_key} in your database.")
+        
 ```

@@ -11,6 +11,7 @@ class Character:
         self.inventory = []
         self.crit_chance = crit_chance
         self.attacks = []
+        self.debuffs = []
 
     def __repr__(self):
         return self.name

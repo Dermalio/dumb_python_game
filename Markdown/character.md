@@ -12,6 +12,7 @@ class Character:
         self.inventory = []
         self.crit_chance = crit_chance
         self.attacks = []
+        self.debuffs = []
 
     def __repr__(self):
         return self.name
@@ -38,6 +39,8 @@ class Character:
         print(f" ATK:    {self.attack_power}")
         print(f" DEF:    {self.resistance}")
         print("=" * 20 + "\n")
+
+
 
 
 ```
